@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holerite</title>
+    <style>
+        body {
+            font-family: Cambria, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color:#000000; /* Cor de fundo neutra */
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #800000;
+            border-radius: 5px;
+            background-color:#8FBC8F; /* Cor de fundo branca */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #000000;
+            border-radius: 30px;
+        }
+
+        .flex-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .flex-item {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: #000000; /* Cor azul padrão */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #000000; /* Cor azul mais escura no hover */
+        }
+
+        #resultado {
+            margin-top: 20px;
+        }
+
+        strong {
+            color: #333; /* Cor do texto forte */
+        }
+
+        p {
+            color: #555; /* Cor do texto normal */
+        }
+
+        /* Estilo para impressão */
+        @media print {
+            body {
+                background-color: #fff; /* Cor de fundo branca para a impressão */
+            }
+
+            .container {
+                border: none; /* Remover a borda na impressão */
+                box-shadow: none; /* Remover sombra na impressão */
+                background-color: #fff; /* Cor de fundo branca para a impressão */
+            }
+
+            button {
+                display: none; /* Ocultar botão na impressão */
+            }
+
+            /* Estilo para texto no resultado na impressão */
+            #resultado p {
+                color: black !important; /* Cor do texto */
+            }
+
+            /* Estilo para números no resultado na impressão */
+            #resultado p strong {
+                color: black !important; /* Cor dos números */
+            }
+        }
+
+        @page {
+            size: A4; /* Tamanho do papel */
+            margin: 1cm; /* Margens do documento */
+        }
+
+        /* Estilo para o logo */
+        .logo {
+            max-width: 40%;
+            height: auto;
+            margin-bottom: 20px;
+            
+        }
+
+        /* Estilo para campos de entrada extras */
+        .extra-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <center>
+            <img src="png-clipart-computer-icons-payroll-salary-calculator-income-electronics-rectangle-removebg-preview.png" alt="Logo da Empresa" class="logo"> <!-- Substitua "caminho/para/seu/logo.png" pelo caminho correto para o seu logo -->
+            <h1>Calculadora de holerite</h1>
+        </center>
+        <form id="holeriteForm">
+            <label for="salarioBase">Salário Base:</label>
+            <input type="number" id="salarioBase" required>
+            <label for="horaExtra">Hora Extra? (sim/não)</label>
+            <input type="text" id="horaExtra" required onchange="showExtraInput()">
+            <div id="extraInput" class="extra-input">
+                <label for="quantidadeHoraExtra">Quantidade de Horas Extras:</label>
+                <input type="number" id="quantidadeHoraExtra">
+            </div>
+            <label for="diasAtraso">Dias de Atraso:</label>
+            <input type="number" id="diasAtraso" required>
+            <label for="metaAtingida">Meta Atingida? (sim/não)</label>
+            <input type="text" id="metaAtingida" required onchange="showMetaInput()">
+            <div id="metaInput" class="extra-input">
+                <label for="valorAtingido">Valor adicional atingido na meta:</label>
+                <input type="number" id="valorAtingido">
+            </div>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="aceitaValeTransporte">Aceita Vale Transporte? (sim/não):</label>
+                    <input type="text" id="aceitaValeTransporte" required onchange="showValeTransporteInput()">
+                </div>
+                <div class="flex-item">
+                    <label for="descontoValeTransporte">Desconto de 6% do Vale Transporte? (sim/não):</label>
+                    <input type="text" id="descontoValeTransporte" required>
+                </div>
+            </div>
+            <input type="hidden" id="valorDescontoValeTransporte">
+            <div id="valeTransporteInput" class="extra-input" style="display:none;">
+                <label for="valorValeTransporte">Valor do Vale Transporte:</label>
+                <input type="number" id="valorValeTransporte">
+            </div>
+            <label for="beneficioAlimentacao">Benefício Alimentação:</label>
+            <input type="number" id="beneficioAlimentacao" required>
+            <label for="contribuicaoSindical">Deseja descontar Contribuição Sindical? (sim/não)</label>
+            <input type="text" id="contribuicaoSindical" required onchange="showContribuicaoSindicalInput()">
+            <div id="contribuicaoSindicalInput" class="extra-input" style="display:none;">
+                <label for="descontoContribuicaoSindical">Desconto de 5% da Contribuição Sindical:</label>
+                <input type="text" id="descontoContribuicaoSindical" readonly>
+            </div>
+            <center>
+                <button type="button" onclick="calcularHolerite()">Calcular</button>
+            </center>
+        </form>
+        <div id="resultado" style="display:none;"></div>
+    </div>
+    <script>
+        function calcularINSS(salarioBase) {
+            let inss;
+
+            if (salarioBase <= 1045.00) {
+                inss = salarioBase * 0.075;
+            } else if (salarioBase <= 2089.60) {
+                inss = salarioBase * 0.09;
+            } else if (salarioBase <= 3134.40) {
+                inss = salarioBase * 0.12;
+            } else if (salarioBase <= 6101.06) {
+                inss = salarioBase * 0.14;
+            } else {
+                inss = 6101.06 * 0.14;
+            }
+
+            return inss;
+        }
+
+        function calcularIRRF(salarioBase) {
+            let irrf;
+
+            if (salarioBase <= 1903.98) {
+                irrf = 0;
+            } else if (salarioBase <= 2826.65) {
+                irrf = (salarioBase * 0.075) - 142.80;
+            } else if (salarioBase <= 3751.05) {
+                irrf = (salarioBase * 0.15) - 354.80;
+            } else if (salarioBase <= 4664.68) {
+                irrf = (salarioBase * 0.225) - 636.13;
+            } else {
+                irrf = (salarioBase * 0.275) - 869.36;
+            }
+
+            return irrf;
+        }
+
+        function showExtraInput() {
+            const horaExtraInput = document.getElementById('horaExtra');
+            const extraInput = document.getElementById('extraInput');
+            if (horaExtraInput.value.toLowerCase() === 'sim') {
+                extraInput.style.display = 'block';
+            } else {
+                extraInput.style.display = 'none';
+            }
+        }
+
+        function showMetaInput() {
+            const metaAtingidaInput = document.getElementById('metaAtingida');
+            const metaInput = document.getElementById('metaInput');
+            if (metaAtingidaInput.value.toLowerCase() === 'sim') {
+                metaInput.style.display = 'block';
+            } else {
+                metaInput.style.display = 'none';
+            }
+        }
+
+        function showValeTransporteInput() {
+            const aceitaValeTransporteInput = document.getElementById('aceitaValeTransporte');
+            const valeTransporteInput = document.getElementById('valeTransporteInput');
+            const descontoValeTransporteInput = document.getElementById('descontoValeTransporte');
+            if (aceitaValeTransporteInput.value.toLowerCase() === 'sim') {
+                valeTransporteInput.style.display = 'block';
+                descontoValeTransporteInput.style.display = 'block';
+            } else {
+                valeTransporteInput.style.display = 'none';
+                descontoValeTransporteInput.style.display = 'none';
+            }
+        }
+
+        function showContribuicaoSindicalInput() {
+            const contribuicaoSindicalInput = document.getElementById('contribuicaoSindical');
+            const descontoContribuicaoSindicalInput = document.getElementById('descontoContribuicaoSindical');
+            if (contribuicaoSindicalInput.value.toLowerCase() === 'sim') {
+                descontoContribuicaoSindicalInput.style.display = 'block';
+            } else {
+                descontoContribuicaoSindicalInput.style.display = 'none';
+            }
+        }
+
+        function calcularDescontoValeTransporte(salarioBase, valorValeTransporte) {
+            return salarioBase * 0.06;
+        }
+
+        function calcularBonificacaoHorasExtras(salarioBase, quantidadeHoraExtra) {
+            const valorHoraExtra = (salarioBase / 220) * 0.5; // 50% do valor da hora
+            return valorHoraExtra * quantidadeHoraExtra;
+        }
+
+        function calcularHolerite() {
+            const salarioBase = parseFloat(document.getElementById('salarioBase').value);
+            const horaExtra = document.getElementById('horaExtra').value.toLowerCase();
+            const quantidadeHoraExtra = document.getElementById('quantidadeHoraExtra').value;
+            const diasAtraso = parseInt(document.getElementById('diasAtraso').value);
+            const metaAtingida = document.getElementById('metaAtingida').value.toLowerCase();
+            const valorAtingido = parseFloat(document.getElementById('valorAtingido').value);
+            const aceitaValeTransporte = document.getElementById('aceitaValeTransporte').value.toLowerCase();
+            const descontoValeTransporte = document.getElementById('descontoValeTransporte').value.toLowerCase();
+            let valorValeTransporte = 0.0;
+            let descontoValeTransporteValue = 0.0;
+            if (aceitaValeTransporte === 'sim') {
+                valorValeTransporte = parseFloat(document.getElementById('valorValeTransporte').value);
+                descontoValeTransporteValue = calcularDescontoValeTransporte(salarioBase, valorValeTransporte);
+                document.getElementById('valorDescontoValeTransporte').value = descontoValeTransporteValue;
+            }
+            const beneficioAlimentacao = parseFloat(document.getElementById('beneficioAlimentacao').value);
+            const contribuicaoSindical = document.getElementById('contribuicaoSindical').value.toLowerCase();
+            let descontoContribuicaoSindicalValue = 0.0;
+            if (contribuicaoSindical === 'sim') {
+                descontoContribuicaoSindicalValue = salarioBase * 0.05;
+                document.getElementById('descontoContribuicaoSindical').value = descontoContribuicaoSindicalValue;
+            }
+
+            let inss = calcularINSS(salarioBase);
+            let irrf = calcularIRRF(salarioBase);
+            let descontoAtraso = diasAtraso * (salarioBase / 30);
+
+            let bonificacaoLucros = 0;
+            if (metaAtingida === 'sim') {
+                bonificacaoLucros = valorAtingido;
+            }
+
+            let bonificacaoHorasExtras = 0;
+            if (horaExtra === 'sim') {
+                bonificacaoHorasExtras = calcularBonificacaoHorasExtras(salarioBase, quantidadeHoraExtra);
+            }
+
+            let salarioLiquido = salarioBase - inss - irrf - descontoAtraso;
+
+            if (horaExtra === 'sim') {
+                const valorHoraExtra = (salarioBase / 220) * 0.5; // 50% do valor da hora
+                salarioLiquido += valorHoraExtra * quantidadeHoraExtra;
+            }
+
+            if (aceitaValeTransporte === 'sim' && descontoValeTransporte === 'sim') {
+                salarioLiquido -= descontoValeTransporteValue;
+            }
+
+            if (contribuicaoSindical === 'sim') {
+                salarioLiquido -= descontoContribuicaoSindicalValue;
+            }
+
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `
+            <font size="7">
+                <p><strong>== Folha de pagamento ==</strong></p>
+            </font>
+                <p>Salário base: ${salarioBase.toFixed(2)}</p>
+                <p>Desconto INSS: ${inss.toFixed(2)}</p>
+                <p>Desconto IRPF: ${irrf.toFixed(2)}</p>
+                <p>Desconto por atraso: ${descontoAtraso.toFixed(2)}</p>
+                <p>Desconto do Vale Transporte: ${aceitaValeTransporte === 'sim' && descontoValeTransporte === 'sim' ? descontoValeTransporteValue.toFixed(2) : "Não aplicável"}</p>
+                <p>Benefício alimentação: ${beneficioAlimentacao.toFixed(2)}</p>
+                <p>Bonificação por participação nos lucros: ${bonificacaoLucros.toFixed(2)}</p>
+                <p>Bonificação por horas extras: ${bonificacaoHorasExtras.toFixed(2)}</p>
+                <p>Contribuição sindical: ${contribuicaoSindical === 'sim' ? descontoContribuicaoSindicalValue.toFixed(2) : "Não descontado"}</p>
+                <p>Salário líquido: ${salarioLiquido.toFixed(2)}</p>
+                <button onclick="window.print()">Imprimir</button>
+            `;
+            resultadoDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
